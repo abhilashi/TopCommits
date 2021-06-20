@@ -1,0 +1,1 @@
+module.exports.ethEndpoint = "https://ropsten.infura.io/v3/df9d278604d24fb891c8a03c7b5f4b22"

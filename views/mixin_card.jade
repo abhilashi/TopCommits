@@ -1,0 +1,20 @@
+mixin auctionCard(auction, size)
+    a(href="/auctions/"+auction.nftPublicKey).card
+        img.artImage(src=auction.commitArtUrl||"https://f8n-ipfs-production.imgix.net/QmTU61y92pHXzzcjfwtxzyQjKniZxBqjNpArNgEvxUp6ae/nft.png?fit=fill&q=100&w=2560") 
+        .detailsArea 
+            h3.title= auction.commitTitle? auction.commitTitle.substr(0,60)+"...": ""
+            .userDetails 
+              img.userImage(src=auction.commitOwnerPictureUrl)
+              span.userName= auction.commitOwnerUsername
+        .actionArea 
+            div(class="info info1")
+              .infoTitle Current Bid
+              .infoText #{(auction.totalAuction/1000000000000000000).toFixed(2)} ETH 
+            div(class="info info2") 
+              if auction.endsAt > -1
+                .infoTitle Ends 
+                .infoText(class="ends" ends-at=auction.endsAt) ...
+              else
+                .infoTitle Start Bidding 
+                .infoText(class="ends" ends-at=auction.endsAt) NOW
+ 

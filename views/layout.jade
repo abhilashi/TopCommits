@@ -1,0 +1,57 @@
+doctype html
+html
+  head
+    title Top Commits - Own a peice of your favorite open source project 
+    link(rel="icon" href="/images/topcommitlogo.png")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js")
+    script(src="https://unpkg.com/web3@latest/dist/web3.min.js")
+    script.
+      window.w3 = new Web3(web3.currentProvider);
+      window.contract = new w3.eth.Contract(
+        !{process.env.ABI}
+        , "#{process.env.CONTRACT_ADDRESS}");
+
+
+  body
+    .actionbar 
+      .nav
+        if !user
+          a(href="/users/my_profile").button2(style="position:absolute; top: 0px; right: 0px; width: 120px; border-radius: 32px") Login
+        else
+          a(href="/users/my_profile").button2(style="position:absolute; top: 0px; right: 0px; width: 200px; border-radius: 32px") @#{user.githubUsername}
+        center #[a(href="/") #[img(style="margin-top: 16px; height: 64px" src="/images/topcommitsbanner.png")]]
+    block content
+    script.
+
+      function timeLeftStr (secs) {
+        var sec_num = parseInt(secs, 10); // don't forget the second param
+        var hours   = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+        if (hours   < 10) {hours   = "0"+hours;}
+        if (minutes < 10) {minutes = "0"+minutes;}
+        if (seconds < 10) {seconds = "0"+seconds;}
+        return hours+':'+minutes+':'+seconds;
+      }
+
+      $(document).ready(() => {
+        setInterval(() => {
+          const ends = $(".ends");
+          for(let i = 0 ; i < ends.length; i += 1){
+            if($(ends[i]).attr("ends-at") === "-1"){
+              $(ends[i]).text("Not yet started")
+            }
+            else{
+              const endTime = parseInt($(ends[i]).attr("ends-at"))
+              const now = Date.now();
+              if(endTime < now)
+                $(ends[i]).text(moment(endTime).fromNow());
+              else
+                $(ends[i]).text(timeLeftStr((endTime - now)/1000));
+            }
+          }
+        }, 1000)
+      })

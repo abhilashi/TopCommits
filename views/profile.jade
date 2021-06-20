@@ -1,0 +1,44 @@
+extends layout
+include mixin_card
+
+block content
+  center(style="margin-top: 32px")
+    .user @#{user.githubUsername}
+  .sectionTitleHolder 
+    .title Winning Auctions 
+    .sectionStart
+  .cardsArea
+    each auction in winningAuctions 
+      +auctionCard(auction, "small")
+    if winningAuctions.length == 0
+      .help #[a(href="/") Place a higher bid] on a commit to win the auction
+
+  .sectionTitleHolder 
+    .title Withdrawn Auctions 
+    .sectionStart
+  .cardsArea
+    each auction in withdrawnAuctions 
+      +auctionCard(auction, "small")
+    if withdrawnAuctions.length == 0
+      .help No auctions you've won have been withdrawn into your NFT wallet
+
+
+  .sectionTitleHolder 
+    .title Unclaimed Bids 
+    .sectionStart
+  .cardsArea
+    each auction in unclaimedAuctions 
+      +auctionCard(auction, "small")
+    if unclaimedAuctions.length == 0
+      .help There is no auction that is running on one of your GitHub commits. You can list them using the #[a(href="/artify") Artify GitHub Bot].
+
+  .sectionTitleHolder 
+    .title Claimed Bids 
+    .sectionStart
+  .cardsArea
+    each auction in claimedAuctions 
+      +auctionCard(auction, "small")
+    if unclaimedAuctions.length == 0
+      .help You have not claimed the ETH that was used to bid on a commit you made on GitHub
+
+

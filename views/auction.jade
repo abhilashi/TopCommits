@@ -1,0 +1,89 @@
+extends layout
+include mixin_card
+
+block content
+  div(style="width: 100%")
+    .biddingArea
+      .pane1(class="pane")
+        +auctionCard(auction, "small")
+      .pane2(class="pane")
+        p= show
+        if show=="placebid"  
+          h1.title Place a Bid
+          a.link(href=auction.commitUrl) Open on GitHub
+          .inputHolder 
+            input(id="bid" placeholder="0")
+            span.eth ETH
+          .help Once the bid is placed, it cannot be reversed.
+          .button(onclick="bid()") PLACE BID
+          br
+          a(href="/?feed=creator$$"+auction.commitOwnerUsername).user @#{auction.commitOwnerUsername}
+        if show=="withdraw"
+          h1.title Withdraw NFT
+          .help This NFT is yours! Withdraw it to your wallet now!
+          .button2(onclick="withdraw()") Withdraw 
+        if show=="claim"
+          h1.title Claim
+          a.link(href=auction.commitUrl) Open on GitHub
+          .help #{(auction.totalAuction/1000000000000000000).toFixed(2)} ETH are waiting to be claimed by you for this commit!
+          .button2(onclick="claim()") Claim ETH 
+        if show=="ended"
+          h1.title Auction ended!
+          .help You made the last bid? Login to withdraw now!
+          .button2(onclick="window.location.href='/users/my_profile'") Withdraw 
+
+
+      if bids.length > 0
+        .pane3(class="pane")
+          .sectionTitleHolder 
+            .title Activity 
+            .sectionStart
+          each bid in bids
+            a(href="https://etherscan.io/tx/"+bid.txHash target="_blank").activityHolder 
+              img.profilePicture(src="https://www.gravatar.com/avatar/"+Crypto.createHash('md5').update(bid.txHash).digest('hex')+"?s=200&d=identicon")
+              .bidInfo 
+                h3.address= bid.userPublicKey.substr(0,4)+"..."+bid.userPublicKey.substr(bid.userPublicKey.length - 4,4)
+                .help= moment(bid.createdAt).format("hh:mm a MMM DD YYYY ")
+              .bidPrice #{(bid.amountInWei/1000000000000000000).toFixed(2)} ETH
+  script.
+    async function bid(){
+      try{
+        const amount = $("#bid").val();
+        const bid = contract.methods.bid(#{auction.nftPublicKey},"#{auction.nftMetadataUrl}", "#{bidSignature.signature}");
+        const gasPrice = await w3.eth.getGasPrice();
+        const gas = 22000;
+        await bid.send({from: w3.currentProvider.selectedAddress, value: w3.utils.toWei(amount, 'ether'), gasPrice });
+      }catch(e){
+        alert("Bid not placed - Amount refunded");
+      }
+      window.location.reload();
+    }
+    async function withdraw(){
+      try{
+        const withdraw = contract.methods.withdraw(#{auction.nftPublicKey});
+        console.log(`
+        const withdraw = contract.methods.withdraw(#{auction.nftPublicKey});
+        `)
+        await withdraw.send({from: w3.currentProvider.selectedAddress });
+      }catch(e){
+        alert("Withdraw Failed, please try again.")
+      }
+      window.location.reload()
+    }
+
+    async function claim(){
+      try{
+        const claim = contract.methods.claim(#{auction.nftPublicKey}, "#{claimSignature.signature}");
+        await claim.send({from: w3.currentProvider.selectedAddress });
+      }catch(e){
+        alert("Claim Failed, please try again.")
+      }
+      window.location.reload()
+    }
+
+
+
+
+
+
+
