@@ -8,6 +8,7 @@ block content
         +auctionCard(auction, "small")
       .pane2(class="pane")
         p(style="background: #fcf8ca; padding: 20px; color: #636038; margin: 8px; max-width: 300px") #[b Note: ] We are currently on the Ropsten testnet. Please don't transact using mainnet, you will lose your ETH
+        p(style="padding-top: 20px; padding-bottom: 20px; max-width: 400px")= auction.commitDescription
         if show=="placebid"  
           h1.title Place a Bid
           a.link(href=auction.commitUrl) Open on GitHub

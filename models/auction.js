@@ -16,6 +16,7 @@ var AuctionSchema = new Schema({
   commitUrl: String,
   commitArtUrl: String,
   commitTitle: String,
+  commitDescription: String,
   createdAt: { type: Number, default: Date.now },
   endsAt: { type: Number, default: -1 },
   totalAuction: Number, 
@@ -28,11 +29,12 @@ var AuctionSchema = new Schema({
 });
 const AuctionModel = mongoose.model('AuctionModel', AuctionSchema );
 
-async function createAuction(commitUrlRaw) {
+async function createAuction(commitUrlRaw, title, description) {
   try{
   let sanitizedCommitUrl = commitUrlRaw;
   sanitizedCommitUrl = sanitizedCommitUrl.replace("//www.github.com", "//github.com");
   sanitizedCommitUrl = sanitizedCommitUrl.replace("http://", "https://");
+  sanitizedCommitUrl = sanitizedCommitUrl.replace("/commit/", "/commits/");
   if(sanitizedCommitUrl.startsWith("github.com"))
     sanitizedCommitUrl = "https://"+sanitizedCommitUrl;
   
@@ -48,7 +50,8 @@ async function createAuction(commitUrlRaw) {
   const commitOwnerUsername = commitResponse.data.author.login;
   const commitOwnerPictureUrl = commitResponse.data.author.avatar_url;
   const commitUrl = sanitizedCommitUrl;
-  const commitTitle = commitResponse.data.commit.message;
+  const commitTitle = title || commitResponse.data.commit.message;
+  const commitDescription = description || "";
   //create art
   exec("python "+process.env.IMAGE_GENERATOR_DIR+"/generator.py "+apiUrl+" "+nftPublicKey+" "+process.env.ART_DIR, console.log);
   const commitArtUrl = "https://topcommits.com/art/"+nftPublicKey+".png";//"ipfs://topcommits/"+nftPublicKey;//todo
@@ -71,7 +74,8 @@ async function createAuction(commitUrlRaw) {
     endsAt,
     totalAuction: 0,
     bids: [],
-    nftMetadataUrl
+    nftMetadataUrl,
+    commitDescription
   });
   console.log(newAuction)
   await newAuction.save();

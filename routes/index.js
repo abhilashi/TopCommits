@@ -41,11 +41,12 @@ router.get('/', async function(req, res, next) {
   if(feed!=='latest' && auctions.length == 0){
     return res.redirect('/?feed=latest');
   }
-  res.render('index', { title: 'Express', auctions,  feedTitle, feed, bids, user});
+  res.render('index', { auctions,  feedTitle, feed, bids, user});
 });
 
 router.post('/create_auction', async function(req, res){
-  res.send(await createAuction(req.body.commitUrl));
+  if(req.body.artify_bot_token === process.env.ARTIFY_BOT_TOKEN)
+    res.send(await createAuction(req.body.commitUrl, req.body.title, req.body.description));
 });
 
 router.get('/auctions/:auctionId', async function(req, res){
