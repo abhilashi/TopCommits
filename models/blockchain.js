@@ -4,24 +4,6 @@ const { createBid } = require('./bid');
 const { incrementTotalAuction } = require('./user');
 const web3 = new Web3(process.env.RPC_ENDPOINT)
 const contract = new web3.eth.Contract(JSON.parse(process.env.ABI), process.env.CONTRACT_ADDRESS);
-const IPFS = require('ipfs-core')
-
-class Storable {
-  ipfs = null;
-  async init() {
-    this.ipfs =  await IPFS.create();
-    console.log("initiated");
-  }
-  async store(obj){
-    const { cid } = await this.ipfs.add(JSON.stringify(obj))
-    return cid;
-  }
-}
-
-const storable = new Storable();
-storable.init();
-
-
 
 contract.events.BidMade(async function(err, event) {
     console.log(event.returnValues.nftPublicKey);
@@ -56,12 +38,7 @@ async function getCurrentBlock() {
     return await web3.eth.getBlockNumber();
 }
 
-async function storeIfps(obj){
-    return "https://ipfs.io/ipfs/"+(await storable.store(obj));
-}
-
 module.exports.signingPublicKey = signingPublicKey;
 module.exports.signMessage = signMessage;
 module.exports.signMessageMulti = signMessageMulti;
 module.exports.getCurrentBlock = getCurrentBlock;
-module.exports.storeIfps = storeIfps;

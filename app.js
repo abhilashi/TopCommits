@@ -15,7 +15,7 @@ var fileUpload = require('express-fileupload');
 var { registerOauth } = require('express-oauth-any');
 
 
-var mongoDB = process.env.MONGO_CONNECTION || 'mongodb://127.0.0.1/topcommitsdb3';
+var mongoDB = process.env.MONGO_CONNECTION || 'mongodb://127.0.0.1/topcommitsdb4';
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, err => console.log(err));
 
 var app = express();

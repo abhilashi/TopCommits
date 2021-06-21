@@ -12,6 +12,7 @@ block content
     async function connect(){
       if(typeof window.ethereum == "undefined")
         window.href.location = "https://metamask.io";
+      await window.ethereum.enable();
 
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
       const account = accounts[0];

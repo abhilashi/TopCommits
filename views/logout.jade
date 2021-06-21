@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  center
+    h1 Logged Out
+    h2 Thank you for dropping by! You'll be redirected in a few seconds
+    iframe(src="https://giphy.com/embed/TdQtqjp28oXNjkEct4" width="480" height="480" frameBorder="0" class="giphy-embed")
+  script.
+    $(document).ready(function(){
+      setTimeout(() => window.location.href="/", 3000);
+      window.ethereum.disable();
+    })

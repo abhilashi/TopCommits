@@ -23,6 +23,19 @@ html
           a(href="/users/my_profile").button2(style="position:absolute; top: 0px; right: 0px; width: 200px; border-radius: 32px") @#{user.githubUsername}
         center #[a(href="/") #[img(style="margin-top: 16px; height: 64px" src="/images/topcommitsbanner.png")]]
     block content
+    br
+    br
+    br
+    hr
+    br
+    center
+      a(href="/?feed=latest") Latest TopCommits | 
+      a(href="/") Trending TopCommits | 
+      a(href="https://forms.gle/aGuXBQLXYkxbXCVZ7") Add a TopCommit
+    br
+    br
+    br
+
     script.
 
       function timeLeftStr (secs) {

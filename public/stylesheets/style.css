@@ -118,7 +118,7 @@ color: #000000;
 flex: none;
 order: 0;
 flex-grow: 0;
-margin: 20px 0px;
+margin: 20px 0px 0px 8px;
 }
 
 .sectionTitleHolder>.sectionStart {
@@ -150,6 +150,7 @@ margin: 20px 0px;
 .cardsArea {
   display: flex;
   flex-wrap: wrap;
+  padding: 16px;
 }
 
 
@@ -536,6 +537,7 @@ flex-grow: 0;
   background-color: black;
   color: #FFFFFF;
   margin-top: 20px;
+  cursor: pointer;
 }
 
 .button2 {
@@ -547,6 +549,7 @@ flex-grow: 0;
   background: -webkit-linear-gradient(45deg, #B0DD45, #F7C23F,#F09C31,#ED6843,#EF4663,#FC2FB5,#B917CC,#103FFC,#4AACFA  );
   color: #FFFFFF;
   margin-top: 20px;
+  cursor: pointer;
 }
 
 .user {

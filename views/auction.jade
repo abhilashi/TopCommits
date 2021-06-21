@@ -7,14 +7,15 @@ block content
       .pane1(class="pane")
         +auctionCard(auction, "small")
       .pane2(class="pane")
-        p= show
+        p(style="background: #fcf8ca; padding: 20px; color: #636038; margin: 8px; max-width: 300px") #[b Note: ] We are currently on the Ropsten testnet. Please don't transact using mainnet, you will lose your ETH
         if show=="placebid"  
           h1.title Place a Bid
           a.link(href=auction.commitUrl) Open on GitHub
           .inputHolder 
-            input(id="bid" placeholder="0")
+            input(id="bid" placeholder="0" value=(auction.totalAuction * 1.2/1000000000000000000).toFixed(3))
             span.eth ETH
-          .help Once the bid is placed, it cannot be reversed.
+          .help Once the bid is placed, it cannot be reversed. 
+          .help Min bid now is #{(auction.totalAuction * 1.11/1000000000000000000).toFixed(4)} ETH 
           .button(onclick="bid()") PLACE BID
           br
           a(href="/?feed=creator$$"+auction.commitOwnerUsername).user @#{auction.commitOwnerUsername}
@@ -46,7 +47,13 @@ block content
                 .help= moment(bid.createdAt).format("hh:mm a MMM DD YYYY ")
               .bidPrice #{(bid.amountInWei/1000000000000000000).toFixed(2)} ETH
   script.
+    function checkRequirements(){
+      if(typeof window.ethereum === "undefined")
+        window.location.href = "https://metamask.io"
+      window.ethereum.enable();
+    }
     async function bid(){
+      checkRequirements();
       try{
         const amount = $("#bid").val();
         const bid = contract.methods.bid(#{auction.nftPublicKey},"#{auction.nftMetadataUrl}", "#{bidSignature.signature}");
@@ -54,11 +61,13 @@ block content
         const gas = 22000;
         await bid.send({from: w3.currentProvider.selectedAddress, value: w3.utils.toWei(amount, 'ether'), gasPrice });
       }catch(e){
+        console.log(e)
         alert("Bid not placed - Amount refunded");
       }
       window.location.reload();
     }
     async function withdraw(){
+      checkRequirements();
       try{
         const withdraw = contract.methods.withdraw(#{auction.nftPublicKey});
         console.log(`
@@ -72,6 +81,7 @@ block content
     }
 
     async function claim(){
+      window.location.href = "https://metamask.io"
       try{
         const claim = contract.methods.claim(#{auction.nftPublicKey}, "#{claimSignature.signature}");
         await claim.send({from: w3.currentProvider.selectedAddress });

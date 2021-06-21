@@ -40,5 +40,9 @@ router.get('/new_profile/:signature', async function(req, res, next) {
   res.redirect('/users/my_profile');
 });
 
+router.get('/logout', async function(req, res){
+  delete req.session.github;
+  res.render('logout');
+});
 
 module.exports = router;

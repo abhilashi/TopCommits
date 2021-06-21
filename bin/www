@@ -7,12 +7,14 @@
 var app = require('../app');
 var debug = require('debug')('topcommits:server');
 var http = require('http');
+var https = require('https');
+var fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.STAGE === "PROD"?'80':'3000');
 app.set('port', port);
 
 /**
@@ -87,4 +89,13 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+}
+
+
+if(process.env.STAGE === "PROD"){
+  const options = {
+	cert: fs.readFileSync('./sslcerts/fullchain.pem'),
+	key: fs.readFileSync('./sslcerts/privkey.pem')
+    };
+  https.createServer(options, app).listen(443);
 }

@@ -5,7 +5,7 @@ var axios = require('axios');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var { getUserFromUsername } = require('./user');
-const { storeIfps } = require('./blockchain');
+const { storeIfps } = require('./ipfs');
 const { exec } = require('child_process');
 
 
@@ -50,7 +50,7 @@ async function createAuction(commitUrlRaw) {
   const commitUrl = sanitizedCommitUrl;
   const commitTitle = commitResponse.data.commit.message;
   //create art
-  exec(process.env.IMAGE_GENERATOR_DIR+"/generate.py "+commitUrl+" "+nftPublicKey+" "+process.env.ART_DIR, console.log);
+  exec("python "+process.env.IMAGE_GENERATOR_DIR+"/generator.py "+apiUrl+" "+nftPublicKey+" "+process.env.ART_DIR, console.log);
   const commitArtUrl = "https://topcommits.com/art/"+nftPublicKey+".png";//"ipfs://topcommits/"+nftPublicKey;//todo
   const nftMetadataUrl = await storeIfps({
     name: "Top Commit #"+nftPublicKey,
@@ -83,7 +83,7 @@ async function createAuction(commitUrlRaw) {
 }
 
 async function getAuction(nftPublicKey){
-  return AuctionModel.findOne({ nftPublicKey });
+  return await AuctionModel.findOne({ nftPublicKey });
 }
 
 async function getOpenAuctions( start=0, end=100) {

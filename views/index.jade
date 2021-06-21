@@ -9,7 +9,7 @@ block content
       .pane1(style="display: inline-block")
         img(src=auctions[0].commitArtUrl, style="margin: 32px; height: 300px; width: 300px") 
       .pane2(style="display: inline-block")
-        h1(style="color:white")= auctions[0].commitTitle 
+        h1(style="color:white;max-width: 500px")= auctions[0].commitTitle 
         br
         a(href="/?feed=creator$$"+auctions[0].commitOwnerUsername).user @#{auctions[0].commitOwnerUsername}
         br
