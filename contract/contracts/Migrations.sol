@@ -7,13 +7,12 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
     uint32 transactionFeePercentage;
     address payable private marketplaceOwner;
     uint256 ownerBalance;
-    uint256 auctionLength;
     struct Bid {
         address payable bidder;
         uint256 bidInWei;
         string uri;
         bool claimed;
-        uint256 startBlock;
+        uint256 startBlockTimestamp;
         bool flag;
     }
     mapping(uint256 => Bid) private auctions;
@@ -21,7 +20,6 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
         marketplaceOwner = payable(msg.sender);
         transactionFeePercentage = 0;
         ownerBalance = 0;
-        auctionLength = 0; //blocks
         nftName = "Top Commits by Questbook";
         nftSymbol = "TCQ";
 
@@ -61,14 +59,14 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
         address nftSigner = getSigner(messageHash, signature);
         require(nftSigner == marketplaceOwner, "NFT Bids need to be signed by contract owner");
         if(auctions[nftPublicKey].flag){
-            //require(auctions[nftPublicKey].startBlock + auctionLength > block.number, "Auction has ended");
-            //require(!auctions[nftPublicKey].claimed, "This auction has ended");
+            require(auctions[nftPublicKey].startBlockTimestamp + 1 days > block.timestamp, "Auction has ended");
+            require(!auctions[nftPublicKey].claimed, "This auction has ended");
             require(msg.value > auctions[nftPublicKey].bidInWei * 11/10, "Bid should be more than 110% of prev bid");
             //refund
             auctions[nftPublicKey].bidder.transfer(auctions[nftPublicKey].bidInWei);
         }
         else {
-            auctions[nftPublicKey].startBlock = block.number;
+            auctions[nftPublicKey].startBlockTimestamp = block.timestamp;
             auctions[nftPublicKey].uri = uri;
             auctions[nftPublicKey].claimed = false;
             auctions[nftPublicKey].flag = true;
@@ -82,8 +80,8 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
         return auctions[nftPublicKey].bidInWei;
     }
 
-    function getAuctionStart(uint256 nftPublicKey) public view returns( uint256            ){
-        return auctions[nftPublicKey].startBlock;
+    function getAuctionStart(uint256 nftPublicKey) public view returns( uint256 ){
+        return auctions[nftPublicKey].startBlockTimestamp;
     }
 
     function setTransactionFeesPercentage(uint32 percentage) public {
@@ -102,7 +100,7 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
     function withdraw(uint256 nftPublicKey) public payable {
         ownerBalance += msg.value;
         require(msg.sender != address(0), "Unknown user");
-        //require(auctions[nftPublicKey].startBlock + auctionLength < block.number, "Can be withdrawn only after the auction has ended");
+        require(auctions[nftPublicKey].startBlockTimestamp + 1 days < block.timestamp, "Can be withdrawn only after the auction has ended");
         require(auctions[nftPublicKey].bidder == msg.sender, "Can be withdrawn only by the winning bidder");
         super._mint(msg.sender, nftPublicKey);
         super._setTokenUri(nftPublicKey, auctions[nftPublicKey].uri);
@@ -139,16 +137,6 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
     function getOwner() public view returns(address payable){
       return marketplaceOwner;
     }
-
-    function setAuctionLength(uint256 length) public {
-      require(msg.sender == marketplaceOwner);
-      auctionLength = length;
-    }
-
-    function getAuctionLength() public view returns(uint256) {
-      return auctionLength;
-    }
-
 
     event log_bytes32(bytes32 s);
     event log_address(address s);
