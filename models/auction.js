@@ -34,14 +34,13 @@ async function createAuction(commitUrlRaw, title, description) {
   let sanitizedCommitUrl = commitUrlRaw;
   sanitizedCommitUrl = sanitizedCommitUrl.replace("//www.github.com", "//github.com");
   sanitizedCommitUrl = sanitizedCommitUrl.replace("http://", "https://");
-  sanitizedCommitUrl = sanitizedCommitUrl.replace("/commit/", "/commits/");
   if(sanitizedCommitUrl.startsWith("github.com"))
     sanitizedCommitUrl = "https://"+sanitizedCommitUrl;
-  
-  const apiUrl = sanitizedCommitUrl.replace("//github.com", "//api.github.com/repos");
+ 
+  const apiUrl = sanitizedCommitUrl.replace("//github.com", "//api.github.com/repos").replace("/commit/","/commits/");
   const nftPublicKey = Date.now();//web3.utils.sha3(sanitizedCommitUrl);
 
-  const existingAuction = await AuctionModel.findOne({ nftPublicKey });
+  const existingAuction = await AuctionModel.findOne({ commitUrl: sanitizedCommitUrl });
   console.log("existing", existingAuction);
   if(existingAuction)
     return existingAuction;

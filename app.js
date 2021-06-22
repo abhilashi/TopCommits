@@ -9,6 +9,7 @@ dotenv.config();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var botRouter = require('./routes/bot');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var fileUpload = require('express-fileupload');
@@ -43,6 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/github-bot', botRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

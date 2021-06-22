@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@octokit/webhooks": "^9.8.3",
     "axios": "^0.21.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -21,6 +22,7 @@
     "moment": "^2.29.1",
     "mongoose": "^5.12.13",
     "morgan": "~1.9.1",
+    "octokit": "^1.0.6",
     "web3": "^1.3.6"
   }
 }
