@@ -59,7 +59,7 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
         address nftSigner = getSigner(messageHash, signature);
         require(nftSigner == marketplaceOwner, "NFT Bids need to be signed by contract owner");
         if(auctions[nftPublicKey].flag){
-            require(auctions[nftPublicKey].startBlockTimestamp + 1 days > block.timestamp, "Auction has ended");
+            require(auctions[nftPublicKey].startBlockTimestamp + (1 days) > block.timestamp, "Auction has ended");
             require(!auctions[nftPublicKey].claimed, "This auction has ended");
             require(msg.value > auctions[nftPublicKey].bidInWei * 11/10, "Bid should be more than 110% of prev bid");
             //refund
@@ -100,7 +100,7 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
     function withdraw(uint256 nftPublicKey) public payable {
         ownerBalance += msg.value;
         require(msg.sender != address(0), "Unknown user");
-        require(auctions[nftPublicKey].startBlockTimestamp + 1 days < block.timestamp, "Can be withdrawn only after the auction has ended");
+        require(auctions[nftPublicKey].startBlockTimestamp + (1 days) < block.timestamp, "Can be withdrawn only after the auction has ended");
         require(auctions[nftPublicKey].bidder == msg.sender, "Can be withdrawn only by the winning bidder");
         super._mint(msg.sender, nftPublicKey);
         super._setTokenUri(nftPublicKey, auctions[nftPublicKey].uri);
@@ -119,6 +119,7 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
     function claim(uint256 nftPublicKey, bytes memory signature) public {
         bytes32 keyHash = keccak256(abi.encodePacked(nftPublicKey, msg.sender));
         bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keyHash));
+        require(auctions[nftPublicKey].startBlockTimestamp + (1 days) < block.timestamp, "Can be claimed only after the auction has ended");
         require(getSigner(messageHash, signature) == owner, "Needs signature from owner to claim auction bids");
         auctions[nftPublicKey].claimed = true;
         payable(msg.sender).transfer(auctions[nftPublicKey].bidInWei);
@@ -131,40 +132,21 @@ contract TopCommitMarketplace is NFTokenMetadata, Ownable{
     }
 
     function withdrawOnwerBalance() public {
-
+      payable(owner).transfer(ownerBalance);
+      ownerBalance = 0;
     }
 
     function getOwner() public view returns(address payable){
       return marketplaceOwner;
     }
 
-    event log_bytes32(bytes32 s);
-    event log_address(address s);
-    function test1(uint256 nftPublicKey) public pure returns(uint256){
-      return auctions[nftPublicKey].bidInWei;
-    }
-    function test2(uint256 nftPublicKey) public pure returns(bool){
-      return auctions[nftPublicKey].claimed;
+    function getCurrentTimestamp() public view returns(uint256){
+      return block.timestamp;
     }
 
-    function test3(uint256 nftPublicKey, bytes memory signature) public returns(address){
-        bytes32 keyHash = keccak256(abi.encodePacked(nftPublicKey, msg.sender));
-        bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keyHash));
-        emit log_address(getSigner(messageHash, signature));
+    function getAuctionEnd(uint256 nftPublicKey) public view returns(uint256) {
+      return auctions[nftPublicKey].startBlockTimestamp + (1 days);
     }
-    function test4(uint256 p1) public {
-      emit BidMade(p1, 0, address(0));
-    }
-    function claimAdmin(uint256 nftPublicKey, bytes memory signature, address sender) public {
-        bytes32 keyHash = keccak256(abi.encodePacked(nftPublicKey, sender));
-        bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keyHash));
-        require(getSigner(messageHash, signature) == owner, "Needs signature from owner to claim auction bids");
-        auctions[nftPublicKey].claimed = true;
-        payable(sender).transfer(auctions[nftPublicKey].bidInWei);
-        emit Claimed(nftPublicKey, sender, auctions[nftPublicKey].bidInWei);
-    }
-
-
 }
 
 

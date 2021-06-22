@@ -1,5 +1,7 @@
 node_modules
 .env
+contract/.secret
+contract/.deploymentkey
 github.pem
 sslcerts/
 public/art/*
